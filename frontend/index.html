@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cognitive Pathfinding: Cyberpunk Edition</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap"
+        rel="stylesheet">
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <!-- SANDBOX SECTION: 3D View + Controls -->
+    <section id="sandbox-section">
+        <div id="canvas-container"></div>
+
+        <div id="ui-container">
+            <h1 class="neon-text">COGNITIVE_NAV</h1>
+            <div class="panel controls">
+                <div class="input-group">
+                    <label>START NODE:</label>
+                    <input type="text" id="start-node" value="1" maxlength="3">
+                </div>
+                <div class="input-group">
+                    <label>END NODE:</label>
+                    <input type="text" id="end-node" value="100" maxlength="3">
+                </div>
+                <p class="hint">Click nodes in 3D view to select</p>
+                <button class="cyber-btn" onclick="runAlgorithm()">INITIALIZE ROUTING</button>
+            </div>
+
+            <div class="panel toggles">
+                <label class="toggle-label"><input type="checkbox" id="toggle-classical" checked
+                        onchange="updateVisibility()"> <span>[CLASSICAL DIJKSTRA]</span></label>
+                <label class="toggle-label"><input type="checkbox" id="toggle-modified" checked
+                        onchange="updateVisibility()"> <span>[COGNITIVE DIJKSTRA]</span></label>
+                <label class="toggle-label"><input type="checkbox" id="toggle-astar" checked
+                        onchange="updateVisibility()"> <span>[A* ALGORITHM]</span></label>
+                <label class="toggle-label"><input type="checkbox" id="toggle-bellman" checked
+                        onchange="updateVisibility()"> <span>[BELLMAN-FORD]</span></label>
+            </div>
+        </div>
+
+        <div id="results-container" class="hidden">
+            <div class="panel results-box classical-box">
+                <h2 class="neon-red">CLASSICAL DIJKSTRA</h2>
+                <div id="classical-stats"></div>
+            </div>
+
+            <div class="panel results-box modified-box">
+                <h2 class="neon-blue">MODIFIED DIJKSTRA</h2>
+                <div id="modified-stats"></div>
+            </div>
+
+            <div class="panel explanation-panel" id="explanation-panel">
+                <h2 class="neon-purple">SYSTEM_ANALYSIS</h2>
+                <pre id="explanation-text"></pre>
+            </div>
+        </div>
+
+        <!-- Path Color Legend -->
+        <div id="path-legend">
+            <div class="legend-title">PATH LEGEND</div>
+            <div class="legend-item"><span class="legend-color" style="background: #FF3333;"></span> Classical Dijkstra</div>
+            <div class="legend-item"><span class="legend-color" style="background: #00FFFF;"></span> Cognitive Dijkstra</div>
+            <div class="legend-item"><span class="legend-color" style="background: #00FF88;"></span> A* Algorithm</div>
+            <div class="legend-item"><span class="legend-color" style="background: #FFFF00;"></span> Bellman-Ford</div>
+            <div class="legend-divider"></div>
+            <div class="legend-item"><span class="legend-color" style="background: #4488AA;"></span> Regular Edge</div>
+            <div class="legend-item"><span class="legend-color" style="background: #FF8800;"></span> Stair Edge</div>
+        </div>
+
+        <div id="scroll-hint">
+            <span>↓ SCROLL FOR ANALYTICS ↓</span>
+        </div>
+    </section>
+
+    <!-- DASHBOARD SECTION: Analytics & Research -->
+    <section id="dashboard-section">
+        <div class="dashboard-container">
+            <!-- Algorithm Comparison -->
+            <div class="dashboard-row">
+                <div class="dashboard-card full-width">
+                    <h2 class="card-title neon-text">ALGORITHM COMPARISON</h2>
+                    <div class="chart-container">
+                        <canvas id="comparison-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-row">
+                <!-- Metrics Bar Chart -->
+                <div class="dashboard-card">
+                    <h2 class="card-title neon-blue">METRICS BREAKDOWN</h2>
+                    <div class="chart-container">
+                        <canvas id="metrics-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Cognitive Load Radar -->
+                <div class="dashboard-card">
+                    <h2 class="card-title neon-purple">COGNITIVE LOAD PROFILE</h2>
+                    <div class="chart-container">
+                        <canvas id="radar-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Efficiency Chart -->
+            <div class="dashboard-row">
+                <div class="dashboard-card full-width">
+                    <h2 class="card-title neon-green">ALGORITHM EFFICIENCY</h2>
+                    <p class="card-text" style="margin-bottom: 15px;">Nodes visited vs. path quality tradeoff — lower-left is better (fewer nodes explored, lower cognitive weight)</p>
+                    <div class="chart-container">
+                        <canvas id="efficiency-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Algorithm Results Table -->
+            <div class="dashboard-row">
+                <div class="dashboard-card full-width">
+                    <h2 class="card-title neon-pink">DETAILED RESULTS</h2>
+                    <div class="table-container">
+                        <table id="results-table">
+                            <thead>
+                                <tr>
+                                    <th>Algorithm</th>
+                                    <th>Distance</th>
+                                    <th>Turns</th>
+                                    <th>Stairs</th>
+                                    <th>Junctions</th>
+                                    <th>Cognitive Weight</th>
+                                    <th>Path Length</th>
+                                    <th>Nodes Visited</th>
+                                    <th>Time Complexity</th>
+                                    <th>Space Complexity</th>
+                                </tr>
+                            </thead>
+                            <tbody id="results-tbody">
+                                <tr><td colspan="10" class="empty-state">Run simulation to see results</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic Analysis Row -->
+            <div class="dashboard-row">
+                <!-- Graph Properties -->
+                <!-- Memory & Runtime -->
+                <div class="dashboard-card">
+                    <h2 class="card-title neon-red">MEMORY & RUNTIME</h2>
+                    <div id="memory-usage">
+                        <table class="memory-table">
+                            <thead>
+                                <tr>
+                                    <th>Algorithm</th>
+                                    <th>Est. Memory</th>
+                                    <th>Actual Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="memory-tbody">
+                                <tr><td colspan="3" class="empty-state">Run simulation to see results</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Path Similarity -->
+                <div class="dashboard-card">
+                    <h2 class="card-title neon-purple">PATH SIMILARITY (Jaccard Index)</h2>
+                    <div id="path-similarity" class="similarity-grid">
+                        <p class="card-text" style="margin-bottom: 10px; font-size: 12px;">
+                            Jaccard Index: |A ∩ B| / |A ∪ B| — Higher = more similar paths
+                        </p>
+                        <div id="similarity-matrix"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graph Properties & Optimality Row -->
+            <div class="dashboard-row">
+                <!-- Graph Properties -->
+                <div class="dashboard-card">
+                    <h2 class="card-title neon-blue">GRAPH PROPERTIES</h2>
+                    <div id="graph-properties" class="properties-grid">
+                        <div class="property-item">
+                            <span class="property-label">Vertices (V)</span>
+                            <span class="property-value" id="prop-nodes">-</span>
+                        </div>
+                        <div class="property-item">
+                            <span class="property-label">Edges (E)</span>
+                            <span class="property-value" id="prop-edges">-</span>
+                        </div>
+                        <div class="property-item">
+                            <span class="property-label">Density</span>
+                            <span class="property-value" id="prop-density">-</span>
+                        </div>
+                        <div class="property-item">
+                            <span class="property-label">Avg Degree</span>
+                            <span class="property-value" id="prop-degree">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Optimality Guarantees -->
+                <div class="dashboard-card">
+                    <h2 class="card-title neon-green">OPTIMALITY GUARANTEES</h2>
+                    <div id="optimality-info" class="optimality-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Research Basis -->
+            <div class="dashboard-row">
+                <div class="dashboard-card full-width">
+                    <h2 class="card-title neon-yellow">RESEARCH BASIS</h2>
+                    <div id="research-citations" class="research-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Algorithm Descriptions -->
+            <div class="dashboard-row">
+                <div class="dashboard-card half-width">
+                    <h3 class="card-subtitle">Classical Dijkstra</h3>
+                    <p class="card-text">Finds the shortest path based purely on physical distance. Optimal for minimizing travel distance but ignores cognitive complexity.</p>
+                </div>
+                <div class="dashboard-card half-width">
+                    <h3 class="card-subtitle">Cognitive Dijkstra</h3>
+                    <p class="card-text">Modified Dijkstra using weighted cognitive factors. Prioritizes paths that are easier to navigate mentally, even if longer.</p>
+                </div>
+                <div class="dashboard-card half-width">
+                    <h3 class="card-subtitle">A* Algorithm</h3>
+                    <p class="card-text">Uses heuristic (Euclidean distance) to guide search toward goal. More efficient than Dijkstra for single-target pathfinding.</p>
+                </div>
+                <div class="dashboard-card half-width">
+                    <h3 class="card-subtitle">Bellman-Ford</h3>
+                    <p class="card-text">Handles negative edge weights and detects negative cycles. Slower but more versatile than Dijkstra.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

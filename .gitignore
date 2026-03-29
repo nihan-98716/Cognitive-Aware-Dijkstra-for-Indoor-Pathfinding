@@ -1,0 +1,22 @@
+# Environment variables
+.env
+backend/.env
+
+# Non-project folders
+daa/
+share/
+
+# Virtual environment
+venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Output
+output/
+
+# IDE
+.vscode/
+.idea/

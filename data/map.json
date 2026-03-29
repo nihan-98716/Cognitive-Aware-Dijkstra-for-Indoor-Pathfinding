@@ -1,0 +1,48 @@
+{
+    "nodes": {
+        "A": {
+            "x": 100,
+            "y": 100
+        },
+        "B": {
+            "x": 300,
+            "y": 100
+        },
+        "C": {
+            "x": 500,
+            "y": 100
+        },
+        "D": {
+            "x": 300,
+            "y": 300
+        }
+    },
+    "edges": [
+        {
+            "from": "A",
+            "to": "B",
+            "distance": 2,
+            "turn_penalty": 1
+        },
+        {
+            "from": "B",
+            "to": "C",
+            "distance": 2,
+            "turn_penalty": 2
+        },
+        {
+            "from": "A",
+            "to": "D",
+            "distance": 2,
+            "turn_penalty": 0
+        },
+        {
+            "from": "D",
+            "to": "C",
+            "distance": 2,
+            "turn_penalty": 0
+        }
+    ],
+    "start": "A",
+    "end": "C"
+}
