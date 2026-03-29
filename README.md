@@ -191,19 +191,19 @@ These values are based on wayfinding research and can be adjusted in `backend/co
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                        Frontend (Three.js)                  │
-│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐  │
-│  │ 3D Renderer  │  │ UI Controls  │  │ Animation Engine│  │
-│  └──────────────┘  └──────────────┘  └─────────────────┘  │
+│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐    │
+│  │ 3D Renderer  │  │ UI Controls  │  │ Animation Engine│    │
+│  └──────────────┘  └──────────────┘  └─────────────────┘    │  
 └──────────────────────────┬──────────────────────────────────┘
                            │ HTTP/JSON
 ┌──────────────────────────▼──────────────────────────────────┐
 │                     Backend (Flask API)                     │
-│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐  │
-│  │ Graph Builder│  │  Algorithms  │  │ Metrics Engine  │  │
-│  └──────────────┘  └──────────────┘  └─────────────────┘  │
-│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐  │
-│  │ Map Generator│  │  Traversal   │  │ AI Explanations │  │
-│  └──────────────┘  └──────────────┘  └─────────────────┘  │
+│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐    │
+│  │ Graph Builder│  │  Algorithms  │  │ Metrics Engine  │    │
+│  └──────────────┘  └──────────────┘  └─────────────────┘    │
+│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐    │
+│  │ Map Generator│  │  Traversal   │  │ AI Explanations │    │
+│  └──────────────┘  └──────────────┘  └─────────────────┘    │
 └──────────────────────────┬──────────────────────────────────┘
                            │
                   ┌────────▼─────────┐
@@ -497,29 +497,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 - Three.js - WebGL 3D library
 - Anthropic Claude - AI explanations
 - Chart.js - Visualization
-
----
-
-## 📞 Contact
-
-- **Issues**: GitHub Issues
-- **Email**: your.email@example.com
-
----
-
-## ❓ FAQ
-
-**Q: Why is the cognitive route longer?**  
-A: It trades distance for cognitive load reduction (fewer turns, stairs, decisions).
-
-**Q: Can I use this for real buildings?**  
-A: Yes! Replace the map generator with your building''s floor plan data.
-
-**Q: Do I need the Anthropic API?**  
-A: No, deterministic explanations are provided as fallback.
-
-**Q: How do I adjust penalties?**  
-A: Edit `backend/cognitive_weights.py` and tune α, β, γ coefficients.
 
 ---
 
