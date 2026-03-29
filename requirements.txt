@@ -1,2 +1,19 @@
-flask
-pillow
+# Core Web Framework
+flask>=3.0.0
+flask-cors>=4.0.0
+
+# Image Processing
+pillow>=10.0.0
+
+# Environment Configuration
+python-dotenv>=1.0.0
+
+# AI Integration (Optional - for explanations)
+anthropic>=0.18.0
+
+# Document Generation
+python-docx>=1.0.0
+
+# Development Tools (Optional)
+# pytest>=7.4.0
+# black>=23.0.0

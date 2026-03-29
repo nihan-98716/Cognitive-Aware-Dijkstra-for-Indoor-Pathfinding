@@ -1,22 +1,128 @@
-# Environment variables
+# ============================================
+# Cognitive Navigation System - .gitignore
+# ============================================
+
+# Environment Variables
 .env
+.env.local
+.env.*.local
 backend/.env
+backend/.env.local
 
-# Non-project folders
-daa/
-share/
-
-# Virtual environment
+# Virtual Environment
 venv/
+env/
+ENV/
+.venv/
+*.virtualenv
 
 # Python
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Output
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# Logs
+*.log
+logs/
+backend_server.log
+backend_server.err.log
+frontend_server.log
+frontend_server.err.log
+
+# Output & Generated Files
 output/
+*.png
+*.jpg
+*.jpeg
+*.gif
+!docs/images/*.png
+!docs/images/*.jpg
 
-# IDE
+# IDE & Editor Files
 .vscode/
 .idea/
+*.swp
+*.swo
+*.swn
+*.bak
+*~
+.DS_Store
+Thumbs.db
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Project-specific
+daa/
+Cognitive_Navigation_System_Report.docx
+*.backup.md
+
+# Node modules (if using any JavaScript build tools)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+
+# Database files (if any)
+*.db
+*.sqlite
+*.sqlite3

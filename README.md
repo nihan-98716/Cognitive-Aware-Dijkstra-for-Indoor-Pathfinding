@@ -1,542 +1,528 @@
-# Cognitive-Aware Dijkstra for Indoor Pathfinding
+# 🧭 Cognitive Navigation System
 
-<<<<<<< HEAD
-A research/demo system for **indoor navigation** that compares:
-=======
-A research/demo system for indoor navigation that compares:
->>>>>>> e322968 (readme)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Flask](https://img.shields.io/badge/Flask-3.0+-green.svg)](https://flask.palletsprojects.com/)
+[![Three.js](https://img.shields.io/badge/Three.js-r128-orange.svg)](https://threejs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-- **Classical Dijkstra** (distance-only shortest path), vs.
-- **Cognitive-Aware Dijkstra** (distance + penalties for turns, stairs, and decision-heavy junctions)
+**A research-driven indoor navigation system that compares multiple pathfinding algorithms with cognitive load awareness for enhanced human wayfinding.**
 
-<<<<<<< HEAD
-The backend exposes a clean **Flask API** that computes both routes for the same start/end nodes and returns:
-- the **paths**
-- the **node-expansion traversal order** (for animation)
-- **route metrics** (distance, turns, stairs, junctions)
-- a **cognitive weight score**
-- an **explainability summary** (optionally generated with the Anthropic API)
+This project implements and visualizes four distinct pathfinding algorithms—**Classical Dijkstra**, **Cognitive-Aware Dijkstra**, **A\***, and **Bellman-Ford**—to demonstrate how incorporating cognitive factors (turns, stairs, decision points) produces routes that better align with human navigation preferences.
 
-A **Three.js “cyberpunk” frontend** visualizes a **100-node, 2-floor 3D graph** and animates traversal and final paths.
-=======
-The backend exposes a clean Flask API that computes both routes for the same start/end nodes and returns:
-
-- the paths
-- the node-expansion traversal order (for animation)
-- route metrics (distance, turns, stairs, junctions)
-- a cognitive weight score
-- an explainability summary (optionally generated with the Anthropic API)
-
-A **Three.js "cyberpunk" frontend** visualizes a 100-node, 2-floor 3D graph and animates traversal and final paths.
->>>>>>> e322968 (readme)
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-Active-brightgreen" alt="Status">
+  <img src="https://img.shields.io/badge/Type-Research%20%26%20Demo-blueviolet" alt="Type">
+</p>
 
 ---
 
-## Motivation
+## 📋 Table of Contents
 
-<<<<<<< HEAD
-Indoor navigation is not only a geometry problem—it's also a human factors problem.
-
-A route that is **shortest in meters** can still be frustrating if it requires:
-- many turns (wayfinding effort),
-- stairs (physical effort/accessibility constraints),
-- repeated junction decisions (cognitive load and error-proneness).
-
-This project demonstrates a simple practical approach:  
-=======
-Indoor navigation is not only a geometry problem—it's also a **human factors** problem.
-
-A route that is shortest in meters can still be frustrating if it requires:
-
-- many **turns** (wayfinding effort),
-- **stairs** (physical effort/accessibility constraints),
-- repeated **junction decisions** (cognitive load and error-proneness).
-
-This project demonstrates a simple practical approach:
->>>>>>> e322968 (readme)
-**optimize the route cost function to better match how humans experience indoor navigation.**
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [Motivation](#-motivation)
+- [Algorithms Implemented](#-algorithms-implemented)
+- [Cognitive Edge Weighting](#-cognitive-edge-weighting)
+- [System Architecture](#-system-architecture)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [API Documentation](#-api-documentation)
+- [Data Model](#-data-model)
+- [Configuration](#%EF%B8%8F-configuration)
+- [Project Structure](#-project-structure)
+- [Implementation Details](#-implementation-details)
+- [Research Background](#-research-background)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Acknowledgements](#-acknowledgements)
 
 ---
 
-## Key idea: Cognitive edge weighting
+## 🎯 Overview
 
-Each edge in the indoor graph can include:
+Indoor navigation is not merely a geometry problem—it's a **human factors challenge** that requires understanding cognitive load, physical constraints, and wayfinding effort. A route that is shortest in meters may still be frustrating if it requires:
 
-- `distance`
-- `turn_penalty`
-- `stairs_penalty`
-- `junction_penalty`
+- **Many turns** → Increased wayfinding effort
+- **Stairs** → Physical exertion and accessibility barriers
+- **Complex junctions** → Cognitive load and error-proneness
 
-The cognitive-aware edge weight is:
+The **Cognitive Navigation System** addresses this by implementing multiple pathfinding algorithms and comparing their performance on a **100-node, 2-floor 3D indoor map**. The system provides:
 
-<<<<<<< HEAD
-\[
-w = distance + \alpha\cdot turns + \beta\cdot stairs + \gamma\cdot junctions
-\]
-
-Recommended coefficients used in the project description:
-
-- **α = 2** (turn penalty coefficient)
-- **β = 4** (stairs penalty coefficient)
-- **γ = 1** (junction penalty coefficient)
-=======
-$$w = \text{distance} + \alpha \cdot \text{turns} + \beta \cdot \text{stairs} + \gamma \cdot \text{junctions}$$
-
-Recommended coefficients used in this project:
-
-| Coefficient | Value | Purpose |
-|-------------|-------|---------|
-| α | 2 | Turn penalty multiplier |
-| β | 4 | Stairs penalty multiplier |
-| γ | 1 | Junction penalty multiplier |
->>>>>>> e322968 (readme)
-
-This turns Dijkstra into a **multi-factor optimization** that can prefer slightly longer corridors if they reduce wayfinding effort.
+1. **Backend Flask API** - Computes routes using four different algorithms
+2. **Interactive 3D Frontend** - Visualizes paths with a cyberpunk-themed Three.js interface
+3. **AI-Powered Explanations** - Generates route comparisons using Anthropic''s Claude API
+4. **Real-time Animation** - Shows algorithm traversal step-by-step
 
 ---
 
-## What this repository contains
+## ✨ Key Features
 
-### Backend (Flask, Python)
-<<<<<<< HEAD
-The backend computes both algorithms and returns results in a single response for easy comparison and visualization.
+### 🔬 Multi-Algorithm Comparison
+- **Classical Dijkstra**: Pure distance-based shortest path
+- **Cognitive-Aware Dijkstra**: Distance + cognitive penalties (turns, stairs, junctions)
+- **A\* Algorithm**: Heuristic-guided search using Euclidean distance
+- **Bellman-Ford**: Handles negative weights, useful for "bonus" paths
 
-**Core endpoints**
-- `GET /`  
-  Health check / quick hint
-- `GET /map`  
-  Returns the embedded/generated indoor map (nodes + edges)
-- `GET /run?start=<id>&end=<id>`  
-  Runs both classical and cognitive Dijkstra and returns:
-  - `classicalPath`, `modifiedPath`
-  - `classicalMetrics`, `modifiedMetrics`
-  - `classicalTraversal`, `modifiedTraversal`
-  - `explanation`
-  - `map` (so the frontend renders the exact same graph)
+### 🎮 Interactive 3D Visualization
+- Real-time **100-node indoor map** rendered in Three.js
+- **Cyberpunk-themed UI** with neon effects and glowing paths
+- **Click-to-select** nodes directly in the 3D scene
+- **Animated traversal** showing algorithm exploration in real-time
+- **Dual-floor visualization** (ground and first floor)
 
-### Frontend (Three.js)
-The UI provides:
-- start/end node inputs (defaults `1 → 100`)
-=======
+### 📊 Comprehensive Metrics
+- **Total Distance** - Physical path length
+- **Turn Count** - Number of direction changes
+- **Stairs Count** - Vertical transitions
+- **Junction Count** - Decision points
+- **Cognitive Weight** - Composite score incorporating all factors
 
-The backend computes both algorithms and returns results in a single response for easy comparison and visualization.
+### 🤖 AI-Powered Explainability
+- **Anthropic Claude integration** for natural language route explanations
+- **Fallback deterministic explanations** when API unavailable
+- **Cyberpunk-styled narratives** comparing route characteristics
 
-#### Core endpoints
-
-| Endpoint | Description |
-|----------|-------------|
-| `GET /` | Health check / quick hint |
-| `GET /map` | Returns the embedded/generated indoor map (nodes + edges) |
-| `GET /run?start=<id>&end=<id>` | Runs both classical and cognitive Dijkstra and returns: `classicalPath`, `modifiedPath`, `classicalMetrics`, `modifiedMetrics`, `classicalTraversal`, `modifiedTraversal`, `explanation`, `map` |
-
-### Frontend (Three.js)
-
-The UI provides:
-
-- start/end node inputs (defaults `1` → `100`)
->>>>>>> e322968 (readme)
-- toggles for classical path / modified path / explanation panel
-- animated traversal visualization (node expansion flashing)
-- neon-styled results panels showing route metrics and cognitive weight
+### 📈 Visual Analytics
+- **Side-by-side comparison panels** for algorithm results
+- **Chart.js integration** for metric visualization
+- **Color-coded paths**: Red (Classical), Blue (Cognitive), Green (A*), Yellow (Bellman-Ford)
 
 ---
 
-## Repository structure
+## 💡 Motivation
 
-<<<<<<< HEAD
-```text
-.
-├── backend/
-│   ├── app.py                      # Flask API: /map and /run
-=======
+Traditional indoor navigation systems optimize for **geometric distance**, but human wayfinding involves multiple cognitive and physical factors:
+
+### Human Factors in Navigation
+1. **Cognitive Load**: Complex routes with many decisions increase mental effort and error rates
+2. **Physical Accessibility**: Stairs and elevation changes create barriers
+3. **Wayfinding Effort**: Multiple turns require constant re-orientation
+4. **Decision Fatigue**: Each junction adds potential for mistakes
+
+### Research-Backed Approach
+This project demonstrates that by incorporating these factors into the pathfinding cost function, we can generate routes that are:
+- **Easier to follow** (fewer turns and junctions)
+- **More accessible** (fewer stairs when alternatives exist)
+- **Less mentally taxing** (reduced decision points)
+- **Potentially slightly longer** but significantly more user-friendly
+
+---
+
+## 🧮 Algorithms Implemented
+
+### 1. Classical Dijkstra
+**Time Complexity**: O((V + E) log V)
+
+Pure distance-based shortest path algorithm. Guarantees the shortest physical distance but ignores cognitive factors.
+
+```python
+weight = distance
 ```
-.
-├── backend/
-│   ├── app.py                       # Flask API: /map and /run
->>>>>>> e322968 (readme)
-│   ├── classical_dijkstra.py        # Distance-only Dijkstra
-│   ├── classical_weights.py         # Edge weight = distance
-│   ├── cognitive_weights.py         # Edge weight = distance + penalties
-│   ├── dijkstra.py                  # Modified Dijkstra using cognitive weights
-│   ├── embedded_map.py              # Cached 100-node, 2-floor map generator
-│   ├── explanation_generator.py     # Anthropic-based explanation with fallback
-│   ├── graph_builder.py             # Builds adjacency list from map JSON
-│   ├── metrics_calculator.py        # Aggregates metrics and cognitive weight
-│   ├── traversal_logger.py          # Captures node expansion order for animation
-│   └── __init__.py
-├── data/
-<<<<<<< HEAD
-│   └── map.json                     # Small example map (A-D) (not the 100-node generator)
-=======
-│   └── map.json                     # Small example map (A-D)
->>>>>>> e322968 (readme)
-├── frontend/
-│   ├── index.html                   # UI + toggles + panels
-│   ├── script.js                    # Three.js rendering + API calls + animations
-│   └── style.css                    # Cyberpunk styling
-├── requirements.txt
-└── main.py                          # Placeholder (currently empty)
+
+### 2. Cognitive-Aware Dijkstra
+**Time Complexity**: O((V + E) log V)
+
+Enhanced Dijkstra that incorporates cognitive penalties into edge weights.
+
+```python
+weight = distance + α·turns + β·stairs + γ·junctions
+```
+
+### 3. A\* Algorithm
+**Time Complexity**: O(E) best case, O(b^d) worst case
+
+Heuristic-guided search using Euclidean distance to goal. More efficient than Dijkstra for single-target pathfinding.
+
+```python
+f(n) = g(n) + h(n)
+# g(n) = cost from start
+# h(n) = Euclidean distance to goal (admissible heuristic)
+```
+
+### 4. Bellman-Ford Algorithm
+**Time Complexity**: O(VE)
+
+Can handle negative edge weights and detect negative cycles. Useful for scenarios where certain paths provide "bonuses."
+
+```python
+# Relaxes all edges V-1 times
+# Detects negative cycles with additional iteration
 ```
 
 ---
 
-## How it works (end-to-end)
+## 🧠 Cognitive Edge Weighting
 
-1. The backend provides a cached indoor map via `GET /map`.
-2. The frontend fetches the map, renders nodes/edges in 3D, and labels nodes.
-3. When you run routing (`GET /run?start=...&end=...`):
-   - **Classical Dijkstra** computes the path minimizing distance only.
-   - **Cognitive Dijkstra** computes the path minimizing the cognitive weight function.
-<<<<<<< HEAD
-4. The backend computes and returns route metrics and an explanation.
-5. The frontend animates:
-   - traversal order (expansion flashes)
-   - final classical path (neon red)
-   - final cognitive path (neon blue)
-=======
-   - The backend computes and returns route metrics and an explanation.
-4. The frontend animates:
-   - traversal order (expansion flashes)
-   - final classical path (**neon red**)
-   - final cognitive path (**neon blue**)
->>>>>>> e322968 (readme)
+Each edge in the indoor graph contains multiple attributes:
 
----
-
-## Setup
-
-### Prerequisites
-<<<<<<< HEAD
-- Python 3.9+ recommended
-- A modern browser (for WebGL / Three.js)
-- Optional: an Anthropic API key for AI explanations
-
----
-
-## Running the backend (Flask API)
-
-### 1) Install dependencies
-=======
-
-- Python 3.9+ recommended
-- A modern browser (for WebGL / Three.js)
-- Optional: an [Anthropic API key](https://console.anthropic.com/) for AI explanations
-
-### Running the backend (Flask API)
-
-#### 1) Install dependencies
-
->>>>>>> e322968 (readme)
-```bash
-pip install -r requirements.txt
-```
-
-<<<<<<< HEAD
-> Note: `backend/app.py` imports `flask_cors`, and `backend/explanation_generator.py` imports `dotenv` and `anthropic`.
-> If your environment does not already include these packages, add/install:
-> - `flask-cors`
-> - `python-dotenv`
-> - `anthropic`
-
-### 2) Start the server
-Run from the `backend/` directory (recommended due to local imports):
-=======
-> **Note:** `backend/app.py` imports `flask_cors`, and `backend/explanation_generator.py` imports `dotenv` and `anthropic`. If your environment does not already include these packages, add/install:
-> ```bash
-> pip install flask-cors python-dotenv anthropic
-> ```
-
-#### 2) Start the server
-
-Run from the `backend/` directory (recommended due to local imports):
-
->>>>>>> e322968 (readme)
-```bash
-cd backend
-python app.py
-```
-
-The backend will be available at:
-<<<<<<< HEAD
-- `http://127.0.0.1:5000`
-
-### 3) Quick API checks
-=======
-
-```
-http://127.0.0.1:5000
-```
-
-#### 3) Quick API checks
-
->>>>>>> e322968 (readme)
-```bash
-curl http://127.0.0.1:5000/
-curl http://127.0.0.1:5000/map
-curl "http://127.0.0.1:5000/run?start=1&end=100"
-```
-
-<<<<<<< HEAD
----
-
-## Running the frontend (Three.js)
-
-The frontend expects the backend to be running at:
-- `http://127.0.0.1:5000`
-
-### Option A: Use Python’s static server
-=======
-### Running the frontend (Three.js)
-
-The frontend expects the backend to be running at `http://127.0.0.1:5000`.
-
-**Option A: Use Python's static server**
-
->>>>>>> e322968 (readme)
-```bash
-cd frontend
-python -m http.server 8000
-```
-
-<<<<<<< HEAD
-Then open:
-- `http://127.0.0.1:8000`
-
-### What you should see
-- A neon grid / 3D scene with labeled nodes
-- Controls to run routing
-- Two results panels (classical vs modified) with metrics
-- An explanation panel with a “typewriter” effect
-=======
-Then open: `http://127.0.0.1:8000`
-
-**Option B: Open directly**
-
-Open `frontend/index.html` directly in your browser (some browsers may block local CORS—Option A is safer).
-
-### What you should see
-
-- A neon grid / 3D scene with labeled nodes
-- Controls to run routing
-- Two results panels (classical vs modified) with metrics
-- An explanation panel with a "typewriter" effect
->>>>>>> e322968 (readme)
-
----
-
-## Data model
-
-### Nodes
-<<<<<<< HEAD
-The 100-node generator emits nodes with a 3D position:
-=======
-
-The 100-node generator emits nodes with a 3D position:
-
->>>>>>> e322968 (readme)
-```json
-{
-  "id": "42",
-  "position": { "x": 120, "y": 80, "z": 0 }
-}
-```
-
-<<<<<<< HEAD
-### Edges
-Edges support multi-factor penalty fields:
-=======
-- `z = 0` → Ground floor
-- `z = 6` → First floor
-
-### Edges
-
-Edges support multi-factor penalty fields:
-
->>>>>>> e322968 (readme)
 ```json
 {
   "from": "45",
   "to": "55",
-  "distance": 10,
+  "distance": 10.0,
   "turn_penalty": 1,
   "stairs_penalty": 1,
   "junction_penalty": 0
 }
 ```
 
-<<<<<<< HEAD
----
+### Weight Formula
 
-## Metrics reported
+The cognitive weight is calculated as:
 
-For each computed route, the backend returns:
+```
+w = distance + α·turns + β·stairs + γ·junctions
+```
 
-- `totalDistance`
-- `totalTurns`
-- `totalStairs`
-- `totalJunctions`
-- `totalWeight` (computed cognitive cost)
+### Default Coefficients
 
-This enables an apples-to-apples comparison of routes:
-- classical may be shorter in `totalDistance`
-- cognitive-aware may be lower in `totalWeight` by avoiding costly features
-=======
-### Metrics reported
+| Coefficient | Value | Purpose | Justification |
+|-------------|-------|---------|---------------|
+| **α (alpha)** | 2.0 | Turn penalty | Each turn requires re-orientation (2-3 seconds) |
+| **β (beta)** | 4.0 | Stairs penalty | Physical effort + accessibility barrier |
+| **γ (gamma)** | 1.0 | Junction penalty | Cognitive load from decision-making |
 
-For each computed route, the backend returns:
-
-| Metric | Description |
-|--------|-------------|
-| `totalDistance` | Sum of edge distances along the path |
-| `totalTurns` | Sum of turn penalties |
-| `totalStairs` | Sum of stair penalties |
-| `totalJunctions` | Sum of junction penalties |
-| `totalWeight` | Computed cognitive cost using the weight formula |
-
-This enables an apples-to-apples comparison of routes:
-
-- **classical** may be shorter in `totalDistance`
-- **cognitive-aware** may be lower in `totalWeight` by avoiding costly features
->>>>>>> e322968 (readme)
+These values are based on wayfinding research and can be adjusted in `backend/cognitive_weights.py`.
 
 ---
 
-## Explainability (AI + fallback)
+## 🏗 System Architecture
 
-The backend can generate an explanation comparing the two routes.
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        Frontend (Three.js)                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐  │
+│  │ 3D Renderer  │  │ UI Controls  │  │ Animation Engine│  │
+│  └──────────────┘  └──────────────┘  └─────────────────┘  │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ HTTP/JSON
+┌──────────────────────────▼──────────────────────────────────┐
+│                     Backend (Flask API)                     │
+│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐  │
+│  │ Graph Builder│  │  Algorithms  │  │ Metrics Engine  │  │
+│  └──────────────┘  └──────────────┘  └─────────────────┘  │
+│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐  │
+│  │ Map Generator│  │  Traversal   │  │ AI Explanations │  │
+│  └──────────────┘  └──────────────┘  └─────────────────┘  │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+                  ┌────────▼─────────┐
+                  │ Anthropic Claude │
+                  │       API        │
+                  └──────────────────┘
+```
 
-### Option 1: Anthropic-powered explanation
-<<<<<<< HEAD
-Create `backend/.env`:
-=======
+---
 
-Create `backend/.env`:
+## 🚀 Installation
 
->>>>>>> e322968 (readme)
+### Prerequisites
+
+- **Python 3.9+** (recommended 3.11+)
+- **pip** package manager
+- **Modern web browser** with WebGL support (Chrome, Firefox, Edge)
+- **Optional**: [Anthropic API key](https://console.anthropic.com/) for AI explanations
+
+### Step 1: Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/cognitive-navigation.git
+cd cognitive-navigation
+```
+
+### Step 2: Create Virtual Environment (Recommended)
+
+```bash
+# Windows
+python -m venv venv
+venv\Scripts\activate
+
+# macOS/Linux
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### Step 3: Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+**Required packages:**
+```bash
+pip install flask flask-cors pillow python-dotenv anthropic python-docx
+```
+
+### Step 4: Configure Environment (Optional)
+
+For AI-powered explanations, create `backend/.env`:
+
 ```env
-ANTHROPIC_API_KEY=your_key_here
+ANTHROPIC_API_KEY=your_api_key_here
 ```
 
-When enabled, the backend prompts the model to:
-<<<<<<< HEAD
-=======
-
->>>>>>> e322968 (readme)
-- compare both routes,
-- cite numeric metric differences,
-- and produce a short cyberpunk-style narrative.
-
-### Option 2: Built-in deterministic fallback
-<<<<<<< HEAD
-If no key is configured (or the call fails), the backend returns a structured fallback explanation.
-=======
-
-If no key is configured (or the call fails), the backend returns a structured fallback explanation listing the cognitive factors that differ between routes.
->>>>>>> e322968 (readme)
-
 ---
 
-## Implementation notes (for developers)
+## 🎮 Usage
 
-### Map generation
-<<<<<<< HEAD
-`backend/embedded_map.py`:
-- generates a 100-node building-like grid across 2 floors,
-- adds stairwell connectors,
-- and injects “contrast routes”:
-  - a shorter but cognitively complex “shortcut”
-  - a longer but simpler “easy path”
-=======
+### Running the Backend
 
-`backend/embedded_map.py`:
-
-- generates a **100-node building-like grid** across 2 floors,
-- adds **stairwell connectors**,
-- and injects **"contrast routes"**:
-  - a shorter but cognitively complex "shortcut"
-  - a longer but simpler "easy path"
->>>>>>> e322968 (readme)
-
-This makes it easier to observe cases where cognitive-aware routing chooses a different solution than pure distance minimization.
-
-### Traversal animation support
-<<<<<<< HEAD
-Both Dijkstra implementations log visited nodes via `TraversalLogger`, enabling:
-=======
-
-Both Dijkstra implementations log visited nodes via `TraversalLogger`, enabling:
-
->>>>>>> e322968 (readme)
-- step-by-step traversal playback in the frontend
-- comparison of exploration behavior between algorithms
-
----
-
-## Configuration / customization
-
-### Adjust cognitive coefficients (α, β, γ)
-<<<<<<< HEAD
-Default weighting is implemented in:
-- `backend/cognitive_weights.py`
-
-You can tune coefficients to match your use case (e.g., accessibility-first routes can make stairs more expensive).
-
-> Consistency note:
-> - `compute_weight()` defaults to α=2, β=4, γ=1.
-> - `/run` currently passes `alpha=1` into the modified dijkstra call.
->   If you want strict alignment with α=2 everywhere, update the `/run` call accordingly.
-
-### Plug in a real building map
-To use a real dataset:
-=======
-
-Default weighting is implemented in:
-
-```
-backend/cognitive_weights.py
+```bash
+cd backend
+python app.py
 ```
 
-You can tune coefficients to match your use case (e.g., accessibility-first routes can make stairs more expensive).
+Server starts at `http://127.0.0.1:5000/`
 
-> **Consistency note:**
-> `compute_weight()` defaults to α=2, β=4, γ=1.
-> `/run` currently passes `alpha=1` into the modified dijkstra call. If you want strict alignment with α=2 everywhere, update the `/run` call accordingly.
+### Running the Frontend
 
-### Plug in a real building map
+```bash
+cd frontend
+python -m http.server 8000
+```
 
-To use a real dataset:
+Open browser: `http://127.0.0.1:8000/`
 
->>>>>>> e322968 (readme)
-- replace the generator in `embedded_map.py` with a loader for your building graph, or
-- add an endpoint to upload and cache a custom JSON map
+### Using the Application
 
----
-
-<<<<<<< HEAD
-## Known limitations / future work
-
-- Dependency list may need expansion for optional features (`flask-cors`, `python-dotenv`, `anthropic`)
-- `main.py` is currently a placeholder
-- `data/map.json` is a small sample and does not match the 100-node generated graph used by `/map`
-- Edge penalties are simple scalar heuristics; future versions could incorporate:
-  - accessibility constraints,
-  - crowd density,
-  - signage confidence,
-  - user preferences (stairs avoidance, low-turn preference, etc.)
+1. **Select Start/End Nodes** - Type node IDs (1-100) or click nodes in 3D
+2. **Initialize Routing** - Click button to compute paths
+3. **View Results** - Toggle algorithms, compare metrics, read explanations
+4. **Explore 3D Scene** - Left click rotate, right click pan, scroll zoom
 
 ---
 
-## License
+## 📡 API Documentation
 
-No license file is currently included. If you intend to distribute or publish this project, add an explicit license (e.g., MIT, Apache-2.0).
+### Base URL: `http://127.0.0.1:5000`
+
+#### `GET /`
+Health check endpoint.
+
+#### `GET /map`
+Returns the complete 100-node indoor map structure.
+
+#### `GET /weights`
+Returns cognitive weight coefficients and research info.
+
+#### `GET /run?start=<id>&end=<id>`
+Executes all algorithms and returns comprehensive results.
+
+**Example:**
+```bash
+curl "http://127.0.0.1:5000/run?start=1&end=100"
+```
+
+**Response includes:**
+- `classicalPath`, `classicalMetrics`, `classicalTraversal`
+- `modifiedPath`, `modifiedMetrics`, `modifiedTraversal`
+- `astarPath`, `astarMetrics`, `astarTraversal`
+- `bellmanPath`, `bellmanMetrics`
+- `explanation` (AI-generated comparison)
+- `map` (complete graph structure)
 
 ---
 
-## Acknowledgements
+## 📊 Data Model
 
-Built as a demonstration of cognitive-load-aware route planning and explainable algorithmic decision-making for indoor navigation.
-=======
-## License
+### Node Structure
+```json
+{
+  "id": "42",
+  "position": { "x": 120.0, "y": 80.0, "z": 0.0 }
+}
+```
+- `z = 0`: Ground floor
+- `z = 6`: First floor
 
-This project is provided for educational and research purposes.
->>>>>>> e322968 (readme)
+### Edge Structure
+```json
+{
+  "from": "45",
+  "to": "55",
+  "distance": 10.0,
+  "turn_penalty": 1,
+  "stairs_penalty": 1,
+  "junction_penalty": 0
+}
+```
+
+### Metrics Structure
+```json
+{
+  "totalDistance": 125.0,
+  "totalTurns": 4,
+  "totalStairs": 1,
+  "totalJunctions": 2,
+  "totalWeight": 119.0
+}
+```
+
+---
+
+## ⚙️ Configuration
+
+### Adjust Cognitive Coefficients
+
+Edit `backend/cognitive_weights.py`:
+
+```python
+def compute_weight(edge, alpha=2.0, beta=4.0, gamma=1.0):
+    return (
+        edge["distance"] +
+        alpha * edge.get("turn_penalty", 0) +
+        beta * edge.get("stairs_penalty", 0) +
+        gamma * edge.get("junction_penalty", 0)
+    )
+```
+
+### Custom Map Data
+
+Modify `backend/embedded_map.py` or load custom JSON:
+
+```python
+def get_map():
+    with open(''data/custom_map.json'') as f:
+        return jsonify(json.load(f))
+```
+
+---
+
+## 📁 Project Structure
+
+```
+cognitive-navigation/
+│
+├── backend/                          # Flask API server
+│   ├── app.py                        # Main Flask application
+│   ├── astar.py                      # A* algorithm
+│   ├── bellman_ford.py               # Bellman-Ford algorithm
+│   ├── classical_dijkstra.py         # Distance-only Dijkstra
+│   ├── classical_weights.py          # Classical weight calculation
+│   ├── cognitive_weights.py          # Cognitive weight calculation
+│   ├── dijkstra.py                   # Cognitive-aware Dijkstra
+│   ├── embedded_map.py               # 100-node map generator
+│   ├── explanation_generator.py      # AI-powered explanations
+│   ├── graph_builder.py              # Graph construction
+│   ├── image_generator.py            # Visual generation
+│   ├── metrics_calculator.py         # Route metrics
+│   ├── traversal_logger.py           # Node exploration tracking
+│   └── .env                          # Environment variables
+│
+├── frontend/                         # Three.js UI
+│   ├── index.html                    # Main HTML
+│   ├── script.js                     # 3D rendering & API
+│   └── style.css                     # Cyberpunk styling
+│
+├── data/                             # Sample data
+│   └── map.json                      # Example map
+│
+├── requirements.txt                  # Python dependencies
+├── generate_report.py                # Report generator
+├── README.md                         # This file
+├── LICENSE                           # MIT License
+└── .gitignore                        # Git ignore rules
+```
+
+---
+
+## 🔧 Implementation Details
+
+### Map Generation
+- **100-node building** (10×5 grid, 2 floors)
+- **4 stairwell connectors** between floors
+- **Contrast routes**: shortcut (high cognitive load) vs easy path (low cognitive load)
+
+### Weight Calculation
+```python
+# Classical: distance only
+weight = edge["distance"]
+
+# Cognitive: multi-factor
+weight = distance + α·turns + β·stairs + γ·junctions
+```
+
+### A\* Heuristic
+Uses Euclidean distance (admissible):
+```python
+h(n) = sqrt((x₁-x₂)² + (y₁-y₂)² + (z₁-z₂)²)
+```
+
+---
+
+## 📚 Research Background
+
+### Cognitive Load Theory
+- **Orientation**: Maintaining directional awareness
+- **Decision-making**: Choosing between alternatives
+- **Memory**: Recalling route instructions
+- **Error recovery**: Correcting mistakes
+
+### Research Citations
+- **Klippel et al. (2005)**: Turn penalties (~2-3 seconds per turn)
+- **Montello & Sas (2006)**: Stairs consume 2-3× energy
+- **Hölscher et al. (2006)**: Junctions increase error by 15-25%
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! Areas for contribution:
+- Additional algorithms (D*, Theta*)
+- Real building map importers (GeoJSON, OSM)
+- User preference profiles
+- Mobile-responsive frontend
+- Performance optimization
+- Unit tests
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgements
+
+### Research Foundations
+- Dijkstra, E. W. (1959) - Shortest path algorithm
+- Hart, P. E. (1968) - A* algorithm
+- Klippel, A. (2005) - Wayfinding research
+- Montello, D. R. (2006) - Human factors
+- Hölscher, C. (2006) - Building navigation
+
+### Technologies
+- Flask - Python web framework
+- Three.js - WebGL 3D library
+- Anthropic Claude - AI explanations
+- Chart.js - Visualization
+
+---
+
+## 📞 Contact
+
+- **Issues**: GitHub Issues
+- **Email**: your.email@example.com
+
+---
+
+## ❓ FAQ
+
+**Q: Why is the cognitive route longer?**  
+A: It trades distance for cognitive load reduction (fewer turns, stairs, decisions).
+
+**Q: Can I use this for real buildings?**  
+A: Yes! Replace the map generator with your building''s floor plan data.
+
+**Q: Do I need the Anthropic API?**  
+A: No, deterministic explanations are provided as fallback.
+
+**Q: How do I adjust penalties?**  
+A: Edit `backend/cognitive_weights.py` and tune α, β, γ coefficients.
+
+---
+
+<p align="center">
+  Made with 🧠 for better human navigation
+</p>
