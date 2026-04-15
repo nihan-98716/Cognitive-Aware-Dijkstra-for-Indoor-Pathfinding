@@ -465,18 +465,6 @@ h(n) = sqrt((x₁-x₂)² + (y₁-y₂)² + (z₁-z₂)²)
 
 ---
 
-## 🤝 Contributing
-
-Contributions welcome! Areas for contribution:
-- Additional algorithms (D*, Theta*)
-- Real building map importers (GeoJSON, OSM)
-- User preference profiles
-- Mobile-responsive frontend
-- Performance optimization
-- Unit tests
-
----
-
 ## 📄 License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
